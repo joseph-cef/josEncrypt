@@ -5,26 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CefEncrypt - Cyberpunk Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: radial-gradient(circle at center, #0f0f0f, #000000);
+      background: #000;
       color: #0ff;
       font-family: 'Share Tech Mono', monospace;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 40px;
+      overflow: hidden;
+    }
+
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
     }
 
     h1 {
       font-size: 3rem;
       text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
-      margin-bottom: 40px;
+      margin: 40px 0 20px;
       position: relative;
+      text-align: center;
     }
 
     h1::before, h1::after {
@@ -48,12 +55,15 @@
     }
 
     .container {
+      position: relative;
       width: 80%;
       max-width: 1000px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 20px;
+      z-index: 1;
     }
 
     .input-section, .output-section {
@@ -120,20 +130,29 @@
     }
 
     .footer {
-      margin-top: 40px;
+      margin: 40px 0;
       color: #444;
       font-size: 12px;
       text-align: center;
+      z-index: 1;
+      position: relative;
     }
   </style>
 </head>
 <body>
+
+  <!-- Matrix Rain Background -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- الواجهة -->
   <h1 data-text="HadEncrypt">CefEncrypt</h1>
+
   <div class="container">
     <div class="input-section">
       <input type="text" id="keyInput" placeholder="Enter your key here...">
       <textarea id="inputText" placeholder="Enter your text here..."></textarea>
     </div>
+
     <div class="buttons">
       <div class="action-row">
         <button onclick="encryptText()">Encrypt</button>
@@ -144,10 +163,12 @@
         <button onclick="copyText()">Copy</button>
       </div>
     </div>
+
     <div class="output-section">
       <textarea id="outputText" placeholder="Result..." readonly></textarea>
     </div>
   </div>
+
   <div class="footer">© 2025 HadEncrypt Cyberpunk Edition</div>
 
   <script>
@@ -229,6 +250,47 @@
       resultField.setSelectionRange(0, 99999);
       document.execCommand('copy');
     }
+
+    // Matrix Rain Background (Blue Symbols)
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = 'アァイィウエカサタナハマヤラワン0123456789@#$%^&*()[]{}<>!?+-=αβγδεζηθλμνξοπρστυφχψωΩΣΠ∆ΛΦΨ♠♥♦♣✓✕⊕⊗⌘∞∑∏∂∇';
+
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+
+    const drops = Array(columns).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00cfff'; // Blue color
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
+
 </body>
 </html>
