@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CefEncrypt - Cyberpunk Edition</title>
+  <title>HadEncrypt - Cyberpunk Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
@@ -26,7 +26,6 @@
       height: 100%;
     }
 
-    /* ==== العنوان الجديد ==== */
     h1 {
       font-size: 3rem;
       text-align: center;
@@ -40,14 +39,13 @@
     }
 
     @keyframes colorChange {
-      0%   { color: #091d22; text-shadow: 0 0 5px #091d22, 0 0 10px #091d22; }
-      25%  { color: #ff00ff; text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
-      50%  { color: #0a1f7c; text-shadow: 0 0 5px #0a1f7c, 0 0 10px #0a1f7c; }
-      75%  { color: #860976; text-shadow: 0 0 5px #860976, 0 0 10px #860976; }
-      100% { color: #1a2f74; text-shadow: 0 0 5px #1a2f74, 0 0 10px #1a2f74; }
+      0%   { color: #091d22; text-shadow: 0 0 5px #091d22; }
+      25%  { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }
+      50%  { color: #0a1f7c; text-shadow: 0 0 5px #0a1f7c; }
+      75%  { color: #860976; text-shadow: 0 0 5px #860976; }
+      100% { color: #1a2f74; text-shadow: 0 0 5px #1a2f74; }
     }
 
-    /* ==== باقي التنسيقات ==== */
     .container {
       position: relative;
       width: 80%;
@@ -107,15 +105,17 @@
       font-weight: bold;
       cursor: pointer;
       text-transform: uppercase;
-      box-shadow: 0 0 10px #0ff;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: neonGradient 5s ease infinite;
       font-size: 1rem;
       width: 50%;
       text-align: center;
     }
 
-    button:hover { transform: scale(1.1); }
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #f0f, 0 0 30px #0ff;
+    }
 
     @keyframes neonGradient {
       0% { background-position: 0% 50%; }
@@ -131,14 +131,14 @@
       z-index: 1;
       position: relative;
     }
+
   </style>
 </head>
+
 <body>
 
-  <!-- Matrix Rain Background -->
   <canvas id="matrixCanvas"></canvas>
 
-  <!-- العنوان المعدل -->
   <h1 id="title"></h1>
 
   <div class="container">
@@ -153,8 +153,12 @@
         <button onclick="decryptText()">Decrypt</button>
       </div>
       <div class="action-row">
-        <button onclick="skipAnimation()">Skip Animation</button>
         <button onclick="copyText()">Copy</button>
+        <button onclick="pasteText()">Paste</button>
+      </div>
+      <div class="action-row">
+        <button onclick="skipAnimation()">Skip Animation</button>
+        <button onclick="clearFields()">Clear</button>
       </div>
     </div>
 
@@ -163,51 +167,51 @@
     </div>
   </div>
 
-  <div class="footer">© 2025 CefEncrypt Cyberpunk Edition</div>
+  <div class="footer">© 2025 HadEncrypt Cyberpunk Edition</div>
+
+  <audio src="sound/Mozart Symphony No.40 Molto Allegro.mp3" autoplay hidden loop></audio>
+
+   <audio id="typingSound" preload="auto" loop>
+    <source src="sound/Keyboard Typing Sound Effect no copyright.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
-    // ====== Animation for Title ======
     const title = document.getElementById('title');
-    const text = 'CefEncrypt';
+    const text = 'HadEncrypt';
 
     function typeWriterLoop() {
-      title.innerHTML = ''; // إعادة تعيين النص
+      title.innerHTML = '';
       let i = 0;
-
       function write() {
         if (i < text.length) {
           const span = document.createElement('span');
           span.className = 'colored-letter';
           span.textContent = text.charAt(i);
-
-          // أدخل الحرف في بداية النص (يمين إلى يسار)
           title.insertBefore(span, title.firstChild);
-
           i++;
-          setTimeout(write, 200); // سرعة الكتابة
+          setTimeout(write, 200);
         } else {
-          // بعد كتابة الكلمة، إعادة التكرار بعد تأخير
           setTimeout(typeWriterLoop, 2000);
         }
       }
-
       write();
     }
 
     typeWriterLoop();
 
-    // ====== Matrix Rain Background ======
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
 
     const letters = 'アァイィウエカサタナハマヤラワン0123456789@#$%^&*()[]{}<>!?+-=αβγδεζηθλμνξοπρστυφχψωΩΣΠ∆ΛΦΨ♠♥♦♣✓✕⊕⊗⌘∞∑∏∂∇';
-
     const fontSize = 16;
     const columns = Math.floor(canvas.width / fontSize);
-
     const drops = Array(columns).fill(1);
 
     function drawMatrix() {
@@ -217,38 +221,21 @@
       ctx.fillStyle = '#00cfff';
       ctx.font = `${fontSize}px monospace`;
 
-      for (let i = 0; i < drops.length; i++) {
+      drops.forEach((y, i) => {
         const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-
-        drops[i]++;
-      }
+        ctx.fillText(text, i * fontSize, y * fontSize);
+        drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+      });
     }
 
     setInterval(drawMatrix, 50);
+    window.addEventListener('resize', resizeCanvas);
 
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-
-    // ====== Encryption/Decryption Functions ======
     let typingInterval;
     let fastMode = false;
     let lastResult = '';
 
-    function skipAnimation() {
-      if (typingInterval) {
-        clearInterval(typingInterval);
-      }
-      const resultField = document.getElementById('outputText');
-      resultField.value = lastResult;
-      fastMode = true;
-    }
+    const typingSound = document.getElementById('typingSound');
 
     function encryptText() {
       const input = document.getElementById('inputText').value;
@@ -257,7 +244,8 @@
         showResult('Please enter a key');
         return;
       }
-      const output = btoa(unescape(encodeURIComponent(xorEncrypt(input, key))));
+      const encrypted = xorEncrypt(input, key);
+      const output = btoa(unescape(encodeURIComponent(encrypted)));
       showResult(output);
     }
 
@@ -270,8 +258,8 @@
       }
       try {
         const decoded = decodeURIComponent(escape(atob(input)));
-        const output = xorEncrypt(decoded, key);
-        showResult(output);
+        const decrypted = xorEncrypt(decoded, key);
+        showResult(decrypted);
       } catch (e) {
         showResult('Invalid encrypted data');
       }
@@ -299,21 +287,51 @@
       }
 
       let i = 0;
+      typingSound.currentTime = 0;
+      typingSound.play();
+
       typingInterval = setInterval(() => {
         if (i < text.length) {
           resultField.value += text.charAt(i);
           i++;
         } else {
           clearInterval(typingInterval);
+          typingSound.pause();
+          typingSound.currentTime = 0;
         }
       }, 20);
+    }
+
+    function skipAnimation() {
+      clearInterval(typingInterval);
+      const resultField = document.getElementById('outputText');
+      resultField.value = lastResult;
+      fastMode = true;
+
+      typingSound.pause();
+      typingSound.currentTime = 0;
+    }
+
+    function clearFields() {
+      document.getElementById('inputText').value = '';
+      document.getElementById('outputText').value = '';
+      document.getElementById('keyInput').value = '';
+
+      clearInterval(typingInterval);
+      typingSound.pause();
+      typingSound.currentTime = 0;
     }
 
     function copyText() {
       const resultField = document.getElementById('outputText');
       resultField.select();
-      resultField.setSelectionRange(0, 99999);
       document.execCommand('copy');
+    }
+
+    function pasteText() {
+      navigator.clipboard.readText().then(text => {
+        document.getElementById('inputText').value = text;
+      });
     }
 
   </script>
